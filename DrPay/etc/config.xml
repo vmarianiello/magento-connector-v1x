@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!--
+/**
+ *
+ * @category   Digitalriver
+ * @package    Digitalriver_DrPay
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <drpay_creditcard>
+                <active>0</active>
+                <sort_order>1</sort_order>
+                <model>Digitalriver\DrPay\Model\CreditCard</model>
+                <order_status>pending_payment</order_status>
+                <allowspecific>0</allowspecific>
+                <sort_order>0</sort_order>
+                <title><![CDATA[Credit Card]]></title>
+            </drpay_creditcard>
+            <drpay_paypal>
+                <active>0</active>
+                <sort_order>1</sort_order>
+                <model>Digitalriver\DrPay\Model\PayPal</model>
+                <order_status>pending_payment</order_status>
+                <allowspecific>0</allowspecific>
+                <sort_order>1</sort_order>
+                <title><![CDATA[PayPal]]></title>
+            </drpay_paypal> 
+            <drpay_direct_debit>
+                <active>0</active>
+                <sort_order>1</sort_order>
+                <model>Digitalriver\DrPay\Model\DirectDebit</model>
+                <order_status>pending_payment</order_status>
+                <allowspecific>0</allowspecific>
+                <sort_order>1</sort_order>
+                <title><![CDATA[Direct Debit]]></title>
+            </drpay_direct_debit>
+            <drpay_apple_pay>
+                <active>0</active>
+                <sort_order>1</sort_order>
+                <model>Digitalriver\DrPay\Model\ApplePay</model>
+                <order_status>pending_payment</order_status>
+                <allowspecific>0</allowspecific>
+                <sort_order>1</sort_order>
+                <title><![CDATA[Apple Pay]]></title>
+            </drpay_apple_pay>
+            <drpay_wire_transfer>
+                <active>0</active>
+                <sort_order>1</sort_order>
+                <model>Digitalriver\DrPay\Model\WireTransfer</model>
+                <order_status>pending_payment</order_status>
+                <allowspecific>0</allowspecific>
+                <sort_order>1</sort_order>
+                <title><![CDATA[Wire Transfer]]></title>
+            </drpay_wire_transfer>
+            <drpay_klarna>
+                <active>0</active>
+                <sort_order>1</sort_order>
+                <model>Digitalriver\DrPay\Model\Klarna</model>
+                <order_status>pending_payment</order_status>
+                <allowspecific>0</allowspecific>
+                <sort_order>1</sort_order>
+                <title><![CDATA[Klarna]]></title>
+            </drpay_klarna> 
+        </payment>
+    </default>
+</config>

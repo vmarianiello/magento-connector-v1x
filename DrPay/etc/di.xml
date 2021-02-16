@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+/**
+ *
+ * @category   Digitalriver
+ * @package    Digitalriver_DrPay
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+	<type name="Magento\Quote\Model\Quote">
+        <plugin name="create_dr_quote" type="Digitalriver\DrPay\Plugin\QuotePlugin" sortOrder="1"/>
+    </type> 
+	<type name="Magento\Quote\Model\Quote\Address">
+        <plugin name="create_dr_quote" type="Digitalriver\DrPay\Plugin\QuoteAddressPlugin" sortOrder="1"/>
+    </type> 
+	<type name="Magento\Customer\Model\AccountManagement">
+        <plugin name="set_guest_email" type="Digitalriver\DrPay\Plugin\AccountManagementPlugin" sortOrder="1"/>
+    </type>
+    <type name="Magento\Sales\Model\Order\Shipment">
+        <plugin name="salesOrderShipmentRegister" type="Digitalriver\DrPay\Plugin\Sales\Order\ShipmentPlugin" sortOrder="1"/>
+    </type>
+    <type name="Magento\Sales\Model\Order\Item">
+        <plugin name="salesOrderItemCancel" type="Digitalriver\DrPay\Plugin\Sales\Order\ItemPlugin" sortOrder="1"/>
+    </type>
+	<type name="Digitalriver\DrPay\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="Digitalriver\DrPay\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">DrLogger</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">Digitalriver\DrPay\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ *
+ * @category   Digitalriver
+ * @package    Digitalriver_DrPay
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
+	<router id="standard">
+		<route id="drpay" frontName="drpay">
+			<module name="Digitalriver_DrPay"/>
+		</route>
+	</router>
+</config>

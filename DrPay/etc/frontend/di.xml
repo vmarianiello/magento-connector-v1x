@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ *
+ * @category   Digitalriver
+ * @package    Digitalriver_DrPay
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+	<type name="Magento\Directory\Controller\Currency\SwitchAction">
+        <plugin name="dr_directory_currency_switch_plugin" type="Digitalriver\DrPay\Plugin\Currency\SwitchAction"/>
+    </type> 
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="drpay_creditcard_config_provider" xsi:type="object">Digitalriver\DrPay\Model\CreditCard\ConfigProvider</item>
+                <item name="drpay_paypal_config_provider" xsi:type="object">Digitalriver\DrPay\Model\PayPal\ConfigProvider</item> 
+                <item name="drpay_direct_debit_config_provider" xsi:type="object">Digitalriver\DrPay\Model\DirectDebit\ConfigProvider</item>
+                <item name="drpay_apple_pay_config_provider" xsi:type="object">Digitalriver\DrPay\Model\ApplePay\ConfigProvider</item>    
+                <item name="drpay_wire_transfer_config_provider" xsi:type="object">Digitalriver\DrPay\Model\WireTransfer\ConfigProvider</item> 
+                <item name="drpay_klarna_config_provider" xsi:type="object">Digitalriver\DrPay\Model\Klarna\ConfigProvider</item>            
+            </argument>
+        </arguments>
+    </type>
+</config>

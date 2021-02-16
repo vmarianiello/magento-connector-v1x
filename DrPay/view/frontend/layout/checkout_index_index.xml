@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <script src="Digitalriver_DrPay::js/view/privacy/terms.js"/>
+    </head>
+    <body>
+		<referenceBlock name="require.js">
+			<action method="setTemplate" ifconfig="dr_settings/config/active" >
+				<argument name="template" xsi:type="string">Digitalriver_DrPay::payment/form-top-js.phtml</argument>
+			</action>
+		</referenceBlock> 
+        <referenceContainer name="content">
+            <block ifconfig="payment/drpay_creditcard/active" class="Magento\Framework\View\Element\Template" name="dr_creditcard_form_top" before="checkout.root" cacheable="false" template="Digitalriver_DrPay::payment/form-top-creditcard.phtml"/>
+            <block ifconfig="payment/drpay_paypal/active" class="Magento\Framework\View\Element\Template" name="dr_paypal_form_top" before="checkout.root" cacheable="false" template="Digitalriver_DrPay::payment/form-top-paypal.phtml"/> 
+            <block ifconfig="payment/drpay_direct_debit/active" class="Magento\Framework\View\Element\Template" name="dr_direct_debit_form_top" before="checkout.root" cacheable="false" template="Digitalriver_DrPay::payment/form-top-direct_debit.phtml"/> 
+            <block ifconfig="payment/drpay_apple_pay/active" class="Magento\Framework\View\Element\Template" name="dr_apple_pay_form_top" before="checkout.root" cacheable="false" template="Digitalriver_DrPay::payment/form-top-apple_pay.phtml"/>
+            <block ifconfig="payment/drpay_wire_transfer/active" class="Magento\Framework\View\Element\Template" name="drpay_wire_transfer_form_top" before="checkout.root" cacheable="false" template="Digitalriver_DrPay::payment/form-top-wire_transfer.phtml"/>
+            <block ifconfig="payment/drpay_klarna/active" class="Magento\Framework\View\Element\Template" name="dr_klarna_form_top" before="checkout.root" cacheable="false" template="Digitalriver_DrPay::payment/form-top-klarna.phtml"/> 
+        </referenceContainer>        
+        <referenceBlock name="checkout.root">
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="checkout" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <item name="steps" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="billing-step" xsi:type="array">
+                                            <item name="component" xsi:type="string">uiComponent</item>
+                                            <item name="children" xsi:type="array">
+                                                <item name="payment" xsi:type="array">
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="renders" xsi:type="array">
+                                                            <!-- merge payment method renders here -->
+                                                            <item name="children" xsi:type="array">
+                                                                <item name="drpay_creditcard-payment" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">Digitalriver_DrPay/js/view/payment/creditcard</item>
+                                                                    <item name="methods" xsi:type="array">
+                                                                        <item name="drpay_creditcard" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                    </item>
+                                                                </item>
+                                                                <item name="drpay_paypal-payment" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">Digitalriver_DrPay/js/view/payment/paypal</item>
+                                                                    <item name="methods" xsi:type="array">
+                                                                        <item name="drpay_paypal" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                    </item>
+                                                                </item> 
+                                                                <item name="drpay_direct_debit-payment" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">Digitalriver_DrPay/js/view/payment/direct_debit</item>
+                                                                    <item name="methods" xsi:type="array">
+                                                                        <item name="drpay_direct_debit" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                    </item>
+                                                                </item> 
+                                                                <item name="drpay_apple_pay-payment" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">Digitalriver_DrPay/js/view/payment/apple_pay</item>
+                                                                    <item name="methods" xsi:type="array">
+                                                                        <item name="drpay_apple_pay" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                    </item>
+                                                                </item> 
+                                                                <item name="drpay_wire_transfer-payment" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">Digitalriver_DrPay/js/view/payment/wire_transfer</item>
+                                                                    <item name="methods" xsi:type="array">
+                                                                        <item name="drpay_wire_transfer" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                    </item>
+                                                                </item>
+                                                                <item name="drpay_klarna-payment" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">Digitalriver_DrPay/js/view/payment/klarna</item>
+                                                                    <item name="methods" xsi:type="array">
+                                                                        <item name="drpay_klarna" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+        <!--Privacy terms and condition links-->
+        <referenceContainer name="content">   
+            <container name="privacy.links" htmlTag="div" htmlClass="privacy-links" after="-"/>
+        </referenceContainer>
+        <referenceContainer name="privacy.links">
+            <block class="Digitalriver\DrPay\Block\Privacy\Terms" name="terms" after="privacy.links" template="Digitalriver_DrPay::privacy/terms.phtml"/>
+        </referenceContainer> 
+    </body>
+</page>

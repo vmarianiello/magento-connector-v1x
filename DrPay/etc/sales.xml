@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+/**
+ *
+ * @category   Digitalriver
+ * @package    Digitalriver_DrPay
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Sales:etc/sales.xsd">
+    <section name="quote">
+        <group name="totals">
+            <item name="dr_tax" instance="Digitalriver\DrPay\Model\Total\Quote\DrTax" sort_order="750"/>
+        </group>
+    </section>
+</config>

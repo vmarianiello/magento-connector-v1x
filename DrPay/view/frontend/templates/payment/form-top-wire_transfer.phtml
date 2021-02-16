@@ -1,0 +1,132 @@
+<?php $key = $this->helper('\Digitalriver\DrPay\Helper\Data')->getConfig('dr_settings/config/public_key');?>
+<script type="text/javascript">
+	function drWireLoader(){
+		if(typeof digitalriverjs != "undefined"){ //If url and key set in admin
+			//loadScriptWire(jsUrl, function(){
+			// var script = document.createElement("script"); //Dynamically append the drWirejs
+			// script.onload = function () {
+		    //After append js set Your API Key and Start DigitalRiver.js
+		    var drWirejs = digitalriverjs;
+			// Create a token or display an error when the form is submitted.
+			var paymentForm = document.getElementById('drpay-wire-transfer-btn');
+				paymentForm.addEventListener('click', function(event) {
+				event.preventDefault();
+				var payload = {};
+				//After submit the wire_transfer details create the cart
+	            jQuery.ajax({
+					type: 'POST',
+					showLoader: true, //use for display loader
+					url: BASE_URL + 'drpay/wiretransfer/savedrquote',
+					success: function (response) {
+						if (response.success) {
+							if(response.content.payload){
+								//once cart created get the payment source id
+								getWireSourceId(drWirejs, response.content.payload);
+							} else {
+								document.getElementById('wire-message').innerHTML = "";
+								document.getElementById('wire-message').innerHTML = "<?= $block->escapeJs($block->escapeHtml(__('Unable to process'))); ?>";
+							}
+						}else{
+							document.getElementById('wire-message').innerHTML = "";
+							document.getElementById('wire-message').innerHTML = "<?= $block->escapeJs($block->escapeHtml(__('Unable to process'))); ?>";
+						}
+					}
+				});	
+			});
+		}
+	}
+	function getWireSourceId(drWirejs, payload) {
+		drWirejs.createSource(payload).then(function(result) {
+			document.getElementById('wire-message').innerHTML ="";
+			if(result.error || result.source.state == "failed") {
+				//Something went wrong, display the error message to the customer
+				document.getElementById('wire-message').innerHTML = "<?= $block->escapeJs($block->escapeHtml(__('Unable to process'))); ?>";
+			} else {
+				//Success!  You can now send the token to your server for use in downstream API calls.
+				 var source = result.source;
+				 var edit = '<?php echo $block->escapeJs($block->escapeHtml(__('Edit')));?>';
+				 var checkoutTranslate = '<?php echo $block->escapeJs($block->escapeHtml(__('Checkout')));?>';
+				 window.checkoutConfig.payment.drpay_wire_transfer.redirect_url = BASE_URL + 'drpay/payment/success';
+				 if(source){ 
+					jQuery.ajax({
+						type: 'POST',
+						url: BASE_URL + 'drpay/wiretransfer/savedrsource',
+						data:{"source_id":source.id},
+						showLoader: true, //use for display loader 
+						success: function (response) {
+							if (response.success) {
+								continueWireTransfer();
+							}else{
+								document.getElementById('wire-message').innerHTML = ""; 
+								document.getElementById('wire-message').innerHTML = "<?= $block->escapeJs($block->escapeHtml(__('Unable to process'))); ?>";
+							}
+						},
+					});
+				 }
+			}
+		});
+	} 
+	function editWireTransfer(){
+		require(["jquery"], function ($) {
+			$(".payment-methods .payment-group .step-title").css("display","block");
+			$(".payment-methods .payment-group .payment-method .payment-method-title").css("display","block");
+			$(".payment-methods .payment-group .payment-method .details").css("display","inline-block");
+			$(".payment-methods .payment-group .payment-method .payment-logos").css("display","inline-block");
+			$(".payment-methods .payment-group .payment-method .payment-icon").css("display","inline-block");
+			$("._active .payment-data").css("display","none");
+			$("._active .payment-data").css("display","none");
+			$(".wire_transfer-btn-first").css("display","block");
+			$(".wire_transfer-btn-second").css("display","none");
+			$(".wire_transfer-btn-second .checkout").css("display","none");			
+			// $(".payment-method._active .payment-method-content .payment-method-note").css("display","block"); 
+			$(".primary.payment-button").css("display","block"); 
+			$('.checkout-tabs .nav-pills li').removeClass('active');
+			$('.checkout-tabs .nav-pills li:nth-child(1)').addClass('active');
+			$('.step-content').css('background','none');
+			$('.payment-method-content').css('margin-bottom','10px');	
+			$(".payment-methods .payment-group .payment-method .checkout").css("display","none");
+			$(".payment-methods .payment-group .payment-method #drpay-creditcard-form .checkout").css("display","block");
+			$('.payment_info_text').css("display","block");
+	        if($('#applepay-element').length){ 
+				document.getElementById('applepay-element').style.display = 'none';
+			} 			
+			if(window.checkoutConfig.quoteData.is_virtual){
+				$(".billing-address-details .action-edit-address").css("display","block");
+			}else{
+				$(".billing-address-details .action-edit-address").css("display","none");
+				$(".payment-method-billing-address .billing-address-same-as-shipping-block").css("display","block");
+			}
+		});		
+	}	
+	function continueWireTransfer() {
+		var edit = '<?php echo $block->escapeJs($block->escapeHtml(__('Edit')));?>';
+		var checkoutTranslate = '<?php echo $block->escapeJs($block->escapeHtml(__('Checkout')));?>';
+		var title = "<div class='title'>"+jQuery(".payment-methods .payment-group .payment-method._active .payment-method-title .label span").html()+"</div>";
+		var editlink = "<a class='payment-edit' id='payment-edit-wire_transfer' onclick='editWireTransfer()' href='javascript:void(0)'>"+edit+"</a>";
+		jQuery("._active .payment-data").html(title+editlink);						
+		jQuery("._active .payment-data").css("display","block"); 
+		jQuery(".primary.payment-button").css("display","none");
+		jQuery(".wire_transfer-btn-first").css("display","none");
+		jQuery(".wire_transfer-btn-second").css("display","block");
+		jQuery(".wire_transfer-btn-second .checkout").css("display","block");
+		jQuery(".payment-methods .payment-group .step-title").css("display","none");
+		jQuery(".payment-method._active .payment-method-content .payment-method-note").css("display","none");
+		jQuery(".payment-methods .payment-group .payment-method .payment-method-title").css("display","none");
+		jQuery(".payment-methods .payment-group .payment-method .details").css("display","none");
+		jQuery(".payment-methods .payment-group .payment-method .payment-logos").css("display","none");
+		jQuery(".payment-methods .payment-group .payment-method .payment-icon").css("display","none");
+		jQuery(".payment-methods .payment-group .payment-method .payment-method-instruction").css("display","none");
+		jQuery("#payframe").css("display","none");
+		jQuery('.checkout-tabs .nav-pills li').removeClass('active');
+		jQuery('.checkout-tabs .nav-pills li:nth-child(2)').addClass('active');
+		jQuery(".checkout-index-index h1.page-title .base").html(checkoutTranslate);
+		jQuery('.step-content').css('background','#e6e6e6');
+		jQuery('.payment-method-content').css('margin-bottom','50px');
+		if(window.checkoutConfig.quoteData.is_virtual){
+			jQuery(".billing-address-details .action-edit-address").css("display","none");
+		}else{
+			jQuery(".billing-address-details .action-edit-address").css("display","none");
+			jQuery(".payment-method-billing-address .billing-address-same-as-shipping-block").css("display","none");
+		}
+	}
+</script>

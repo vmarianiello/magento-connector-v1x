@@ -1,0 +1,176 @@
+<?php $key = $this->helper('\Digitalriver\DrPay\Helper\Data')->getConfig('dr_settings/config/public_key');?>
+<script type="text/javascript"> 
+    function drApplePayLoader(){ 		
+        if(typeof digitalriverjs != "undefined"){ //If url and key set in admin             
+                var drApplePayjs = digitalriverjs; 
+                var applePrData; 
+                window.checkoutConfig.payment.drpay_apple_pay.can_make_payment=false; 
+                jQuery.ajax({ 
+                    type: 'POST', 
+                    url: BASE_URL + 'drpay/applepay/savedrquote', 
+                    showLoader: true, //use for display loader
+                    success: function (response) {
+                        if (response.success) {
+                            if(response.content){ 
+                                // console.log(response.content); 
+                                applePrData = response.content;
+                                var applePayRequestData = drApplePayjs.paymentRequest(applePrData); 
+                                var applepay = drApplePayjs.createElement("applepay", applePayRequestData); 
+                                if (applepay.canMakePayment()) { 
+                                    document.getElementById('applepay-parent').style.display = 'block'; 
+                                }
+                                // Show Review page.
+                                var paymentForm = document.getElementById('drpay-apple-btn');
+                                    paymentForm.addEventListener('click', function(event) {
+                                    event.preventDefault();
+                                    continueApplePayOrder(); 
+                                    if (applepay.canMakePayment()) { 
+                                        window.checkoutConfig.payment.drpay_apple_pay.can_make_payment=true;
+                                        applepay.mount("applepay-element"); 
+                                        document.getElementById('applepay-element').style.display = 'block'; 
+                                    }
+                                }); 
+                                applepay.on('source', function(event) {                                   
+                                    event.complete('success');
+                                    var source = event.source;
+									window.checkoutConfig.payment.drpay_apple_pay.redirect_url = BASE_URL + 'drpay/payment/success';
+                                    if(source){
+                                        jQuery.ajax({
+                                            type: 'POST',
+                                            url: BASE_URL + 'drpay/applepay/savedrsource',
+                                            data:{"source_id":source.id},
+                                            showLoader: true, //use for display loader 
+                                            success: function (response) {
+                                                if (response.success) {
+                                                    jQuery(".apple-pay-btn-second button").trigger("click");
+                                                }else{
+                                                    //Show Error Message 
+                                                    document.getElementById('message').innerHTML = ""; 
+                                                    document.getElementById('message').innerHTML = response.content;                                                   
+                                                }
+                                            },
+                                        });
+                                    }
+                                }); 
+                                applepay.on('shippingaddresschange', function(event) {
+                                    var shippingAddress = event.shippingAddress;
+                                    var city = shippingAddress.address.city;
+                                    var country = shippingAddress.address.country;
+                                    var line1 = shippingAddress.address.line1;
+                                    var line2 = shippingAddress.address.line2;
+                                    var postalCode = shippingAddress.address.postalCode;
+                                    var state = shippingAddress.address.state;
+                                    jQuery.ajax({
+                                            type: 'POST',
+                                            url: BASE_URL + 'drpay/applepay/saveaddress',
+                                            data:{"city":city, "country":country, "line1":line1, "line2":line2, "postalCode":postalCode, "state":state},
+                                            showLoader: false, //use for display loader 
+                                            success: function (response) { 
+                                                var newDetails = response; 
+                                                event.updateWith(newDetails);
+                                            }
+                                        });;
+                                });
+                            } 
+                        } 
+                    } 
+                });
+        }
+    } 
+    function continueApplePayOrder()
+    {
+        require(["jquery"], function ($) {        
+            var title = "<div class='title'>"+$(".payment-methods .payment-group .payment-method._active .payment-method-title .label span").html()+"</div>"; 
+            var edit = '<?php echo $block->escapeJs($block->escapeHtml(__('Edit')));?>';
+            var editlink = "<a class='payment-edit' id='payment-edit-applepay' onclick='editApplePay()' href='javascript:void(0)'>"+edit+"</a>";
+            $("._active .payment-data").html(title+editlink);                        
+            $("._active .payment-data").css("display","block"); 
+            $(".payment-methods .payment-group .payment-method .payment-method-content .checkout").css("display","block"); 
+            $(".payment-methods .payment-group .payment-method._active .actions-toolbar").css("display","block"); 
+            $(".payment-methods .payment-group .payment-method._active .checkout").css("display","block"); 
+            $(".primary.payment-button").css("display","none");
+            $(".drpay_apple-btn-first").css("display","none");
+            $(".drpay_apple-btn-second").css("display","block");
+            $(".drpay_apple-btn-second .checkout").css("display","block");
+            $(".payment-methods .payment-group .step-title").css("display","none");
+            $(".payment-method._active .payment-method-content .payment-method-note").css("display","none");
+            $(".payment-methods .payment-group .payment-method .payment-method-title").css("display","none");
+            $(".payment-methods .payment-group .payment-method .details").css("display","none");
+            $(".payment-methods .payment-group .payment-method .payment-logos").css("display","none");
+            $(".payment-methods .payment-group .payment-method .payment-icon").css("display","none");
+            $(".payment-methods .payment-group .payment-method .payment-method-instruction").css("display","none");
+            $("#payframe").css("display","none");
+            $('.checkout-tabs .nav-pills li').removeClass('active');
+            $('.checkout-tabs .nav-pills li:nth-child(2)').addClass('active');
+            $(".checkout-index-index h1.page-title .base").html('Checkout');
+            $('.step-content').css('background','#e6e6e6');
+            $('.payment-method-content').css('margin-bottom','50px'); 
+            $('.payment_info_text').css("display","none"); 
+            $("._active .payment-data").addClass('payment-active');
+            document.getElementById('applepay-parent').style.display = 'block'; 
+            document.getElementById('applepay-element').style.display = 'block';             
+        });        
+    }    
+    function displayApplePayForm(){
+        jQuery(".payment-methods .payment-group .step-title").css("display","block");
+        jQuery(".payment-methods .payment-group .payment-method .payment-method-title").css("display","inline-block");
+        jQuery(".payment-methods .payment-group .payment-method .details").css("display","inline-block");
+        jQuery(".payment-methods .payment-group .payment-method .payment-logos").css("display","inline-block");
+        jQuery(".payment-methods .payment-group .payment-method .payment-icon").css("display","inline-block");
+        jQuery("._active .payment-data").css("display","none");
+        jQuery(".payment-methods .payment-group .payment-method .payment-method-content .checkout").css("display","block"); 
+        jQuery(".payment-methods .payment-group .payment-method._active .actions-toolbar").css("display","none"); 
+        jQuery(".payment-methods .payment-group .payment-method._active .checkout").css("display","none"); 
+        jQuery(".drpay_apple-btn-first").css("display","block");
+        jQuery(".drpay_apple-btn-second").css("display","none");
+        jQuery(".drpay_apple-btn-second .checkout").css("display","none");
+        jQuery(".primary.payment-button").css("display","block"); 
+        jQuery('.checkout-tabs .nav-pills li').removeClass('active');
+        jQuery('.checkout-tabs .nav-pills li:nth-child(1)').addClass('active');
+        jQuery('.step-content').css('background','none');
+        jQuery('.payment-method-content').css('margin-bottom','10px');
+        jQuery(".payment-methods .payment-group .payment-method .checkout").css("display","none");
+        jQuery(".payment-methods .payment-group .payment-method #drpay-payment-form .checkout").css("display","block");
+        jQuery('.payment_info_text').css("display","block");
+		if(window.checkoutConfig.quoteData.is_virtual){
+			jQuery(".billing-address-details .action-edit-address").css("display","none");
+		}else{
+			jQuery(".billing-address-details .action-edit-address").css("display","none");
+			jQuery(".payment-method-billing-address .billing-address-same-as-shipping-block").css("display","none");
+		}
+
+    } 
+    function editApplePay(){ 
+        require(["jquery"], function ($) {    
+            $(".payment-methods .payment-group .step-title").css("display","block");
+            $(".payment-methods .payment-group .payment-method .payment-method-title").css("display","block");
+            $(".payment-methods .payment-group .payment-method .details").css("display","inline-block");
+            $(".payment-methods .payment-group .payment-method .payment-logos").css("display","inline-block");
+            $(".payment-methods .payment-group .payment-method .payment-icon").css("display","inline-block");
+            $("#payframe").css("display","none");
+            $("._active .payment-data").css("display","none");
+            $(".payment-data").removeClass('payment-active');
+            $(".payment-methods .payment-group .payment-method .payment-method-content .checkout").css("display","block"); 
+            // $(".payment-methods .payment-group .payment-method._active .actions-toolbar").css("display","none"); 
+            $(".payment-methods .payment-group .payment-method._active .checkout").css("display","none"); 
+            $(".drpay_apple-btn-first").css("display","block");
+            $(".drpay_apple-btn-second").css("display","none");
+            $(".drpay_apple-btn-second .checkout").css("display","none");
+            $(".primary.payment-button").css("display","block"); 
+            $(".payment-method._active .payment-method-content .payment-method-note").css("display","block");
+            $('.checkout-tabs .nav-pills li').removeClass('active');
+            $('.checkout-tabs .nav-pills li:nth-child(2)').addClass('active'); 
+            $(".checkout-index-index h1.page-title .base").html('Checkout');
+            $('.step-content').css('background','none');
+            $('.payment-method-content').css('margin-bottom','10px');
+            $('.payment_info_text').css("display","none");
+            $('#applepay-element').css("display","none");
+			if(window.checkoutConfig.quoteData.is_virtual){
+				$(".billing-address-details .action-edit-address").css("display","block");
+			}else{
+				$(".billing-address-details .action-edit-address").css("display","block");
+				$(".payment-method-billing-address .billing-address-same-as-shipping-block").css("display","block");
+			}
+        });
+    }    
+</script>

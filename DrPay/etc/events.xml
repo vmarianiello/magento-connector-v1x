@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!--
+/**
+ *
+ * @category   Digitalriver
+ * @package    Digitalriver_DrPay
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">    
+    <event name="sales_order_save_after">
+        <observer name="sales_order_save" instance="Digitalriver\DrPay\Observer\OrderStatusObserver" disabled="false"/>
+    </event>
+    <event name="sales_order_creditmemo_refund">
+        <observer name="sales_order_creditmemo_refund" instance="Digitalriver\DrPay\Observer\OrderRefundObserver" disabled="false"/>
+    </event>
+	<event name="checkout_onepage_controller_success_action">
+        <observer name="checkout_onepage_controller_success_action" instance="Digitalriver\DrPay\Observer\UpdateOrderStatus" />
+    </event>
+    <event name="checkout_cart_product_add_after">
+        <observer name="UnsetDrToken" instance="Digitalriver\DrPay\Observer\UnsetDrToken" disabled="false"/>
+    </event>
+    <event name="checkout_cart_update_items_before">
+        <observer name="UnsetDrToken" instance="Digitalriver\DrPay\Observer\UnsetDrToken" disabled="false"/>
+    </event>
+    <event name="sales_quote_remove_item">
+        <observer name="UnsetDrToken" instance="Digitalriver\DrPay\Observer\UnsetDrToken" disabled="false"/>
+    </event>
+	<event name="dr_place_order_success">
+        <observer name="dr_place_order_success" instance="Digitalriver\DrPay\Observer\UpdateOrderDetails" />
+    </event>
+    <event name="sales_order_invoice_register">
+        <observer name="salesOrderInvoiceRegister" instance="Digitalriver\DrPay\Observer\OrderFulfillmentUpdateToDr" disabled="false"/>
+    </event>
+    <event name="order_cancel_after">
+        <observer name="salesOrderCancel" instance="Digitalriver\DrPay\Observer\OrderCancelObserver" disabled="false"/>
+    </event>
+</config>

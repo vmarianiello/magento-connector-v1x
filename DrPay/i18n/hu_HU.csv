@@ -1,0 +1,36 @@
+﻿English,Hungarian
+Unable to Place Order!! Payment has been failed,Nem tudjuk feldolgozni rendelését. A fizetés igazolása nem sikerült.
+KlarnaCredit Checkout has been canceled.,A Klarna pénztárát lemondták.
+Unable to cancel Klarna Checkout,Jelenleg nem tudjuk lemondási kérelmét a Klarna keresztül leadott rendelését.
+Paypal Checkout has been canceled.,A PayPal pénztárát lemondták.
+Unable to cancel Paypal Checkout,Jelenleg nem tudjuk lemondási kérelmét a PayPal keresztül leadott rendelését.
+Make a payment from your new or existing PayPal account.,Fizetés új vagy meglévő PayPal felhasználói fiók használatával.
+Tax,Adó
+Unable to Place Order,Nem tudjuk feldolgozni rendelését
+Edit,Szerkeszt
+Unable to process,Nem tudjuk feldolgozni
+ending in,a következőre végződik
+New Card,Új kártya
+Credit Card Number,Bankkártyaszám
+Month/Year,Hónap/Év
+Card Security Code,A kártya biztonsági kódja
+Payment Instructions,Fizetési utasítások
+Please make your payment now to complete your order.,"Kérjük, a rendelés befejezéséhez a fizetést most indítsa. "
+Provide your bank with the following wire transfer instruction:,Adja meg a banknak a következő banki utalásra vonatkozó utasításokat:
+Amount:,Összeg:
+Wire Transfer Reference Number:,Banki átutalás hivatkozási száma:
+Bank:,Bank:
+Location:,Hely:
+Account Holder:,Számlatulajdonos:
+Account Number:,Számlaszám:
+Swift Code:,Swift-kód:
+Expiration Time:,Lejárat dátuma:
+Payment Information,Fizetési adatok
+Place Your Order,ADJA MEG A RENDELÉST
+Saved Cards,Mentett hitelkártyafiókok
+Expiration Date:,Lejárat dátuma:
+Save this card for future use,Mentse el ezt a számlát és a fizetési adatokat a jövőbeni vásárlásokhoz.
+Card Name:,Hitelkártya neve
+There is an issue with Refund at DR side,Ez a visszatérítés nem sikerült a Digital River
+Error! Please check your address and try again.,"Hiba! Kérjük, ellenőrizze a címet és próbálja meg újra."
+Failed to get Source! Please try again.,"Nem sikerült Source szerezni. Kérjük, próbálja meg újra."
