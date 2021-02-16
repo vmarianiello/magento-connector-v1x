@@ -1,0 +1,110 @@
+<?php $key = $this->helper('\Digitalriver\DrPay\Helper\Data')->getConfig('dr_settings/config/public_key');?>
+<script type="text/javascript">
+	function drIBPLoader(){		
+		if(typeof digitalriverjs != "undefined"){ //If url and key set in admin
+			//loadScriptIBP(jsUrl, function(){	
+		    //After append js set Your API Key and Start DigitalRiver.js
+		    var drIBPjs = digitalriverjs;
+			// Create a token or display an error when the form is submitted.
+			var paymentForm = document.getElementById('drpay-IBP-btn');
+				paymentForm.addEventListener('click', function(event) {
+				event.preventDefault();
+				var payload = {};
+				//After submit the creditcard details create the cart
+	            jQuery.ajax({
+					type: 'POST',
+					url: BASE_URL + 'drpay/IBP/savedrquote',
+					showLoader: true, //use for display loader 
+					success: function (response) {
+						//console.log(response);
+						if (response.success) {
+							if(response.content.payload){
+								//Update billing address if not updated
+								//jQuery(".checkout-billing-address .action-update").trigger("click");
+								//once cart created get the payment source id
+								var IBPData = response.content.payload;
+								drIBPjs.createSource(IBPData).then(function(result) {
+								    if (result.error) {								        
+										//Something went wrong, display the error message to the customer
+										document.getElementById('IBP-message').innerHTML ="";
+										document.getElementById('IBP-message').innerHTML = "<?= $block->escapeJs($block->escapeHtml(__('Unable to process'))); ?>";
+								    } else {
+								        var source = result.source;
+								        //console.log(source);
+        						        window.checkoutConfig.payment.drpay_IBP.redirect_url = source.redirect.redirectUrl;
+        						        continueIBPOrder();
+								        //send source to back end
+								       // sendToBackend(source);
+								    }
+								});
+							}
+						}else{							
+							//Something went wrong, display the error message to the customer
+							document.getElementById('IBP-message').innerHTML = "";
+							document.getElementById('IBP-message').innerHTML = "<?= $block->escapeJs($block->escapeHtml(__('Unable to process'))); ?>";
+						}
+					}
+				});	
+			});
+		}
+	}
+
+	function continueIBPOrder()
+	{
+		require(["jquery"], function ($) {		
+			var edit = '<?php echo $block->escapeJs($block->escapeHtml(__('Edit')));?>';
+			var title = "<div class='title'>"+$(".payment-methods .payment-group .payment-method._active .payment-method-title .label span").html()+"</div>";
+			var editlink = "<a class='payment-edit' href='javascript:void(0)' id='payment-edit-IBP' onclick='displayIBPForm()'>"+edit+"</a>";
+			$("#payment-data_IBP").html(title+editlink);						
+			$("#payment-data_IBP").css("display","block");
+			$("#payment-data_IBP").addClass('payment-active');
+			$(".IBP-btn-first").css("display","none");
+			$(".IBP-btn-second").css("display","block");
+			$(".IBP-btn-second .checkout").css("display","block");
+			$(".payment-methods .payment-group .step-title").css("display","none");
+			$(".payment-method._active .payment-method-content .payment-method-note").css("display","none");
+			$(".payment-methods .payment-group .payment-method .payment-method-title").css("display","none");
+			$(".payment-methods .payment-group .payment-method .details").css("display","none");
+			$(".payment-methods .payment-group .payment-method .payment-logos").css("display","none");
+			$(".payment-methods .payment-group .payment-method .payment-icon").css("display","none");
+			$(".payment-methods .payment-group .payment-method .payment-method-instruction").css("display","none");
+			$("#payframe").css("display","none");
+			$('.checkout-tabs .nav-pills li').removeClass('active');
+			$('.checkout-tabs .nav-pills li:nth-child(2)').addClass('active');
+			$('.step-content').css('background','#e6e6e6');
+			$('.payment-method-content').css('margin-bottom','50px');
+			if(window.checkoutConfig.quoteData.is_virtual){
+				$(".billing-address-details .action-edit-address").css("display","none");
+			}else{				
+				$(".billing-address-details .action-edit-address").css("display","none");
+				$(".payment-method-billing-address .billing-address-same-as-shipping-block").css("display","none");
+			}
+		});		
+	}	
+	function displayIBPForm(){
+		jQuery(".payment-methods .payment-group .step-title").css("display","block");
+		jQuery(".payment-methods .payment-group .payment-method .payment-method-title").css("display","block");
+		jQuery(".payment-methods .payment-group .payment-method .details").css("display","inline-block");
+		jQuery(".payment-methods .payment-group .payment-method .payment-logos").css("display","inline-block");
+		jQuery(".payment-methods .payment-group .payment-method .payment-icon").css("display","inline-block");
+		jQuery("#drpay-IBP-form").css("display","block");
+		jQuery("#payment-data_IBP").css("display","none");
+		jQuery("#payment-data_IBP").removeClass('payment-active');
+		jQuery(".payment-methods .payment-group .payment-method .payment-method-instruction").css("display","block");
+		jQuery(".payment-methods .payment-group .payment-method .payment-method-content .checkout").css("display","block");
+		jQuery(".payment-methods .payment-group .payment-method .IBP-btn-first").css("display","block");
+		 jQuery(".payment-methods .payment-group .payment-method .IBP-btn-first .checkout").css("display","block");
+		jQuery('.checkout-tabs .nav-pills li').removeClass('active');
+		jQuery('.checkout-tabs .nav-pills li:nth-child(1)').addClass('active');
+		jQuery('.payment-method-content').css('margin-bottom','10px');
+		jQuery(".payment-methods .payment-group .payment-method .checkout").css("display","none");
+		jQuery(".payment-methods .payment-group .payment-method #drpay-creditcard-form .checkout").css("display","block");		
+		jQuery('.step-content').css('background','rgba(0,0,0,0)');
+		if(window.checkoutConfig.quoteData.is_virtual){
+			jQuery(".billing-address-details .action-edit-address").css("display","block");
+		}else{			
+			jQuery(".billing-address-details .action-edit-address").css("display","block");
+			jQuery(".payment-method-billing-address .billing-address-same-as-shipping-block").css("display","block");
+		}
+	}	
+</script>
