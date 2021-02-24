@@ -4,7 +4,7 @@
  * @package  Digitalriver_DrPay
  */
 
-namespace Digitalriver\DrPay\Controller\Applepay;
+namespace Digitalriver\DrPay\Controller\Directdebit;
 
 use Magento\Framework\Controller\ResultFactory;
 
@@ -14,6 +14,7 @@ class Savedrsource extends \Magento\Framework\App\Action\Action
     /**
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Digitalriver\DrPay\Helper\Data $helper
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -31,17 +32,9 @@ class Savedrsource extends \Magento\Framework\App\Action\Action
             'success'        => false,
             'content'        => __("Unable to process")
         ];
-        
-        $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-        $isEnabled = $this->helper->getIsEnabled();
-        if(!$isEnabled) {
-            return $response->setData($responseContent);
-        }
-        
         if ($this->getRequest()->getParam('source_id')) {
             $source_id = $this->getRequest()->getParam('source_id');
             $paymentResult = $this->helper->applyQuotePayment($source_id);
-            $accessToken = $this->_checkoutSession->getDrAccessToken();
             if ($paymentResult) {
                 $responseContent = [
                     'success'        => true,
@@ -49,7 +42,7 @@ class Savedrsource extends \Magento\Framework\App\Action\Action
                 ];
             }
         }
-
+        $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
         $response->setData($responseContent);
 
         return $response;

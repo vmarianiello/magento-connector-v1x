@@ -1,6 +1,7 @@
 <?php $key = $this->helper('\Digitalriver\DrPay\Helper\Data')->getConfig('dr_settings/config/public_key');?>
 <script type="text/javascript">
 	function drWireLoader(){
+		var digitalriverjs = new DigitalRiver("<?php echo $key?>");
 		if(typeof digitalriverjs != "undefined"){ //If url and key set in admin
 			//loadScriptWire(jsUrl, function(){
 			// var script = document.createElement("script"); //Dynamically append the drWirejs
@@ -18,51 +19,108 @@
 					showLoader: true, //use for display loader
 					url: BASE_URL + 'drpay/wiretransfer/savedrquote',
 					success: function (response) {
-						if (response.success) {
-							if(response.content.payload){
-								//once cart created get the payment source id
-								getWireSourceId(drWirejs, response.content.payload);
-							} else {
-								document.getElementById('wire-message').innerHTML = "";
-								document.getElementById('wire-message').innerHTML = "<?= $block->escapeJs($block->escapeHtml(__('Unable to process'))); ?>";
-							}
+						if (response.success) {							
+							getWireSourceId(drWirejs);							
 						}else{
+							//Show Error Message
+							console.log(response);
+							//Something went wrong, display the error message to the customer
 							document.getElementById('wire-message').innerHTML = "";
-							document.getElementById('wire-message').innerHTML = "<?= $block->escapeJs($block->escapeHtml(__('Unable to process'))); ?>";
+							document.getElementById('wire-message').innerHTML = response.content;
 						}
-					}
+					},
 				});	
-			});
+			});			    
+		//});
+		// script.src = jsUrl;
+		// document.getElementsByTagName('head')[0].appendChild(script);
 		}
 	}
-	function getWireSourceId(drWirejs, payload) {
-		drWirejs.createSource(payload).then(function(result) {
-			document.getElementById('wire-message').innerHTML ="";
-			if(result.error || result.source.state == "failed") {
-				//Something went wrong, display the error message to the customer
-				document.getElementById('wire-message').innerHTML = "<?= $block->escapeJs($block->escapeHtml(__('Unable to process'))); ?>";
-			} else {
-				//Success!  You can now send the token to your server for use in downstream API calls.
-				 var source = result.source;
-				 var edit = '<?php echo $block->escapeJs($block->escapeHtml(__('Edit')));?>';
-				 var checkoutTranslate = '<?php echo $block->escapeJs($block->escapeHtml(__('Checkout')));?>';
-				 window.checkoutConfig.payment.drpay_wire_transfer.redirect_url = BASE_URL + 'drpay/payment/success';
-				 if(source){ 
-					jQuery.ajax({
-						type: 'POST',
-						url: BASE_URL + 'drpay/wiretransfer/savedrsource',
-						data:{"source_id":source.id},
-						showLoader: true, //use for display loader 
-						success: function (response) {
-							if (response.success) {
-								continueWireTransfer();
-							}else{
-								document.getElementById('wire-message').innerHTML = ""; 
-								document.getElementById('wire-message').innerHTML = "<?= $block->escapeJs($block->escapeHtml(__('Unable to process'))); ?>";
+	function getWireSourceId(drWirejs){
+		require([
+			'Magento_Checkout/js/model/quote', 
+			'Magento_Checkout/js/model/cart/totals-processor/default', 
+			'Magento_Checkout/js/model/cart/cache'
+		],
+		function (quote,defaultTotal, cartCache){
+			if(quote.getQuoteId()){
+				var billingAddress = quote.billingAddress();
+				var totals = quote.totals();
+				if(billingAddress && totals){
+					var grand_total = 0;
+					if (totals && totals.total_segments) {
+						totals.total_segments.forEach(function (item) {
+							if (item.code == 'grand_total') {
+								grand_total = parseFloat(item.value);
 							}
-						},
-					});
-				 }
+						});
+					}
+					var customerEmail = "";
+					if(window.checkoutConfig.isCustomerLoggedIn){ 
+						customerEmail = window.checkoutConfig.quoteData.customer_email;	
+					}else{ 
+						if(jQuery("#customer-email").length){
+							customerEmail = jQuery("#customer-email").val();		
+						}
+					}
+					var payload = {
+					  "type": "wireTransfer", 
+					  "amount": grand_total, 
+					  //"liveMode":false,
+					  "currency": totals.quote_currency_code,
+					  "owner": {
+							firstName: billingAddress.firstname,
+							lastName: billingAddress.lastname,
+							email: customerEmail, 
+							phoneNumber: billingAddress.telephone,
+							address: {
+								line1: billingAddress.street[0],
+								line2: billingAddress.street[1],
+								city: billingAddress.city,
+								state: (billingAddress.regionCode) ? billingAddress.regionCode:"na",
+								postalCode: billingAddress.postcode,
+								country: billingAddress.countryId
+							}
+						}, 
+						"wireTransfer": {}
+					}
+				}
+				drWirejs.createSource(payload).then(function(result) {
+					console.log(payload);
+					console.log(result);
+	                //cartCache.set('totals',null);
+	                //defaultTotal.estimateTotals();
+					if(result.error || result.source.state == "failed") {
+						//Something went wrong, display the error message to the customer
+						document.getElementById('wire-message').innerHTML = "";
+						document.getElementById('wire-message').innerHTML = "<?php echo $block->escapeJs($block->escapeHtml(__("Failed to get Source! Please try again.")));?>";
+					} else {
+						document.getElementById('wire-message').innerHTML ="";
+						//Success!  You can now send the token to your server for use in downstream API calls.
+						 var source = result.source;
+                         var edit = '<?php echo $block->escapeJs($block->escapeHtml(__('Edit')));?>';
+                         var checkoutTranslate = '<?php echo $block->escapeJs($block->escapeHtml(__('Checkout')));?>';
+						 window.checkoutConfig.payment.drpay_wire_transfer.redirect_url = BASE_URL + 'drpay/wiretransfer/success';
+						 if(source){ 
+						 	jQuery.ajax({
+								type: 'POST',
+								url: BASE_URL + 'drpay/wiretransfer/savedrsource',
+								data:{"source_id":source.id},
+								showLoader: true, //use for display loader 
+								success: function (response) {
+									if (response.success) {
+										continueWireTransfer();
+									}else{
+										//Show Error Message 
+										document.getElementById('wire-message').innerHTML = ""; 
+										document.getElementById('wire-message').innerHTML = response.content;
+										console.log(response);
+									}
+								},
+							});
+						 }
+					}
+				});
 			}
 		});
 	} 

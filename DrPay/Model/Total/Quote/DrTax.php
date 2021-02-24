@@ -46,44 +46,28 @@ class DrTax extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
         }	
 		
 		$accessToken = $this->_checkoutSession->getDrAccessToken();
-                $validateCall = $this->helper->validateCartCall();
-		if(!empty($accessToken) &&  $validateCall === true){
+		$validateCall = $this->helper->validateCartCall();
+
+		if(!empty($accessToken) && $validateCall === true){
 			$tax_inclusive = $this->scopeConfig->getValue('tax/calculation/price_includes_tax', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+
 			$drtax = $this->_checkoutSession->getDrTax();
-			$productTotal = $this->_checkoutSession->getDrProductTotal();
-			$productTax = $this->_checkoutSession->getDrProductTax();
-			$shippingTax = $this->_checkoutSession->getDrShippingTax();
+			
+			$productTotal = $this->_checkoutSession->getDrProductTotal();			
+			$productTotalExcl = $this->_checkoutSession->getDrProductTotalExcl();
 			
 			$orderTotal = $this->_checkoutSession->getDrOrderTotal();
-			$shippingAndHandlingExcl = $this->_checkoutSession->getDrShippingAndHandlingExcl();
-			$discountAmount = abs($total->getDiscountAmount());
 			
-			$productTotalExcl = $this->_checkoutSession->getDrProductTotalExcl();
+			$shippingAndHandlingExcl = $this->_checkoutSession->getDrShippingAndHandlingExcl();
 
 			if($tax_inclusive) {
-				$total->setSubtotalInclTax($productTotal);
-				$total->setSubtotal($productTotalExcl);
-				//$total->setShippingInclTax($shippingAndHandling);
 				$total->setShippingAmount($shippingAndHandlingExcl);
-				//$total->setShippingTaxAmount($shippingTax);
-				//$total->setBaseShippingTaxAmount($this->convertToBaseCurrency($shippingTax));
-			} else {
-				$shippingAndHandling = $this->_checkoutSession->getDrShippingAndHandling();
-				$total->setSubtotalInclTax($productTotal);
-				$total->setSubtotal($productTotalExcl);
-				$total->setShippingInclTax($shippingAndHandling);
-				$total->setShippingAmount($shippingAndHandlingExcl);
-				$total->setShippingTaxAmount($shippingTax);
-				$total->setBaseShippingTaxAmount($this->convertToBaseCurrency($shippingTax));
-				$total->setBaseGrandTotal($this->convertToBaseCurrency($orderTotal));
-				$total->setGrandTotal($orderTotal);
 			}
+			$total->setSubtotalInclTax($productTotal);
+			$total->setSubtotal($productTotalExcl);
 			
 			$total->setBaseGrandTotal($this->convertToBaseCurrency($orderTotal));
-			$total->setGrandTotal($orderTotal);
-
-			//$quote->setDrTax($drtax);
-			//$total->setDrTax($drtax);
+			$total->setGrandTotal($orderTotal);			
 			
 			$total->setBaseTaxAmount($this->convertToBaseCurrency($drtax));
 			$total->setTaxAmount($drtax);

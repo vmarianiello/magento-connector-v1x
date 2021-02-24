@@ -39,17 +39,48 @@ class Savedrsource extends \Magento\Framework\App\Action\Action
     {
         $responseContent = [
             'success'        => false,
-            'content'        => ''
-        ];      
-        if($this->getRequest()->getParam('source_id')){
-            $source_id = $this->getRequest()->getParam('source_id');
-			$this->_checkoutSession->setDrSourceId($source_id);
-			$responseContent = [
-				'success'        => true,
-				'content'        => ''
-			]; 
+            'content'        => __("Unable to process")
+        ];
+        
+        $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+        $isEnabled = $this->helper->getIsEnabled();
+        if(!$isEnabled) {
+            return $response->setData($responseContent);
         }
-		$response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+        
+        $source_id = $this->getRequest()->getParam('source_id');
+        $quote = $this->_checkoutSession->getQuote();
+		$drQuoteError = $this->_checkoutSession->getDrQuoteError();
+	    if ($drQuoteError === false) {
+            if ($this->getRequest()->getParam('source_id')) {
+                $source_id = $this->getRequest()->getParam('source_id');
+                $paymentResult = $this->helper->applyQuotePayment($source_id);
+                $is_save_future = $this->getRequest()->getParam('save_future_use');
+                $save_future_name = $this->getRequest()->getParam('save_future_name');
+                if ($is_save_future == "true" && $save_future_name) {
+                    $name = $this->getRequest()->getParam('save_future_name');
+                    $this->helper->applySourceShopper($source_id, $name);
+                }
+                if ($paymentResult) {
+                    $responseContent = [
+                        'success'        => true,
+                        'content'        => $paymentResult
+                    ];
+                }
+            }
+            if ($this->getRequest()->getParam('option_id')) {
+                $option_id = $this->getRequest()->getParam('option_id');
+                $paymentResult = $this->helper->applyQuotePaymentOptionId($option_id);
+                if ($paymentResult) {
+                    $responseContent = [
+                        'success'        => true,
+                        'content'        => $paymentResult
+                    ];
+                }
+            }
+        }
+
+        
         $response->setData($responseContent);
 
         return $response;

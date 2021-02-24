@@ -47,7 +47,6 @@ class ItemPlugin
                 $drItemId   = $subject->getDrOrderLineitemId();
                 $order      = $subject->getOrder();
                 $drOrderId  = $order->getDrOrderId();
-				$magentoLineItemID = $subject->getItemId();
                 
                 // DR line item id is empty for some child/parent line items
                 if(!empty($drItemId) && !empty($drOrderId)) {
@@ -55,7 +54,6 @@ class ItemPlugin
                         "requisitionID"             => $drOrderId,
                         "noticeExternalReferenceID" => $order->getIncrementId(),
                         "lineItemID"                => $drItemId,
-						"magentoLineItemID"         => $magentoLineItemID,
                         "quantity"                  => $subject->getQtyCanceled()
                     ];
                     

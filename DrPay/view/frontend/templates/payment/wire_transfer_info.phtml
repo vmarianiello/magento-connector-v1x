@@ -20,7 +20,6 @@ $paymentInstruction = $order->getPayment()->getAdditionalInformation();
 		<p><b><?php echo $block->escapeHtml(__("Account Number:")); ?></b> <?php echo $block->escapeHtml($paymentInstruction['accountNumber']); ?></p>
 		<p><b><?php echo $block->escapeHtml(__("Swift Code:")); ?></b> <?php echo $block->escapeHtml($paymentInstruction['swiftCode']); ?></p>
 		<p><b><?php echo $block->escapeHtml(__("Expiration Time:")); ?></b> <?php echo $block->formatDate($paymentInstruction['expirationTime'], \IntlDateFormatter::MEDIUM, true); ?></p>
-		<p><b><?php echo $block->escapeHtml(__("IBAN:")); ?></b> <?php echo $block->escapeHtml($paymentInstruction['iban']); ?></p>
 		<!-- <p>Please ensure you use your <b>Reference Number</b> as your transaction reference when you electronically transfer the money  for payment. </p> -->
 	</div>
 </div>

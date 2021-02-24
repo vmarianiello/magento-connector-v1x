@@ -12,6 +12,7 @@
     <table name="sales_order" resource="default" engine="innodb" comment="">
         <column xsi:type="varchar" name="dr_order_id" nullable="true" length="25" comment="Dr Order Id"/>
         <column xsi:type="varchar" name="dr_order_state" nullable="true" length="55" comment="Dr Order Status"/>
+		<column xsi:type="varchar" name="dr_api_type" nullable="true" length="10" comment="Dr API Type"/>
     </table>
     <table name="sales_order_item" resource="default" engine="innodb" comment="">
         <column xsi:type="varchar" name="dr_order_lineitem_id" nullable="true" length="25" comment="Dr Order Line Item Id"/>

@@ -1,43 +1,58 @@
 <?php $key = $this->helper('\Digitalriver\DrPay\Helper\Data')->getConfig('dr_settings/config/public_key');?>
 <script type="text/javascript">
-	function drPaypalLoader(){		
-		if(typeof digitalriverjs != "undefined"){ //If url and key set in admin			
+	function drPaypalLoader(){
+		var digitalriverjs = new DigitalRiver("<?php echo $key?>");
+		if(typeof digitalriverjs != "undefined"){ //If url and key set in admin
+			//loadScriptPayPal(jsUrl, function(){	
+		    //After append js set Your API Key and Start DigitalRiver.js
 		    var drpaypaljs = digitalriverjs;
 			// Create a token or display an error when the form is submitted.
 			var paymentForm = document.getElementById('drpay-paypal-btn');
 				paymentForm.addEventListener('click', function(event) {
-				event.preventDefault();				
+				event.preventDefault();
+				var payload = {};
 				//After submit the creditcard details create the cart
 	            jQuery.ajax({
 					type: 'POST',
 					url: BASE_URL + 'drpay/paypal/savedrquote',
 					showLoader: true, //use for display loader 
-					success: function (response) {					
+					success: function (response) {
+						//console.log(response);
 						if (response.success) {
-							if(response.content.payload){								
-								drpaypaljs.createSource(response.content.payload).then(function(result) {
+							if(response.content.payload){
+								//Update billing address if not updated
+								//jQuery(".checkout-billing-address .action-update").trigger("click");
+								//once cart created get the payment source id
+								var payPalData = response.content.payload;
+								drpaypaljs.createSource(payPalData).then(function(result) {
 								    if (result.error) {
+								        console.log(result.error);
 										//Something went wrong, display the error message to the customer
-										document.getElementById('paypal-message').innerHTML = '';
-										document.getElementById('paypal-message').innerHTML = "<?= $block->escapeJs($block->escapeHtml(__('Unable to process'))); ?>";
+										document.getElementById('message').innerHTML ="";
+										document.getElementById('message').innerHTML =result.error;								        
 								    } else {
 								        var source = result.source;
+								        //console.log(source);
         						        window.checkoutConfig.payment.drpay_paypal.redirect_url = source.redirect.redirectUrl;
-        						        continuePaypalOrder();								        
+        						        continuePaypalOrder();
+								        //send source to back end
+								       // sendToBackend(source);
 								    }
 								});
-							} else {
-								document.getElementById('paypal-message').innerHTML = '';
-								document.getElementById('paypal-message').innerHTML = "<?= $block->escapeJs($block->escapeHtml(__('Unable to process'))); ?>";
 							}
 						}else{
+							//Show Error Message
+							console.log(response);
 							//Something went wrong, display the error message to the customer
-							document.getElementById('paypal-message').innerHTML = '';
-							document.getElementById('paypal-message').innerHTML = "<?= $block->escapeJs($block->escapeHtml(__('Unable to process'))); ?>";
+							document.getElementById('message').innerHTML = "";
+							document.getElementById('message').innerHTML = response.content;
+							document.getElementById('paypal-message').innerHTML = "";
+							document.getElementById('paypal-message').innerHTML = response.content;
 						}
 					},
 				});	
 			});			    
+		//});
 		}
 	}
 

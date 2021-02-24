@@ -1,7 +1,10 @@
 <?php $key = $this->helper('\Digitalriver\DrPay\Helper\Data')->getConfig('dr_settings/config/public_key');?>
 <script type="text/javascript"> 
-    function drApplePayLoader(){ 		
-        if(typeof digitalriverjs != "undefined"){ //If url and key set in admin             
+    function drApplePayLoader(){ 
+		var digitalriverjs = new DigitalRiver("<?php echo $key?>");
+        if(typeof digitalriverjs != "undefined"){ //If url and key set in admin 
+            //loadScriptApple(jsUrl, function(){ 
+                //After append js set Your API Key and Start DigitalRiver.js
                 var drApplePayjs = digitalriverjs; 
                 var applePrData; 
                 window.checkoutConfig.payment.drpay_apple_pay.can_make_payment=false; 
@@ -30,10 +33,10 @@
                                         document.getElementById('applepay-element').style.display = 'block'; 
                                     }
                                 }); 
-                                applepay.on('source', function(event) {                                   
+                                applepay.on('source', function(event) {
+                                    console.log("GOT APPLE PAY SOURCE ID");
                                     event.complete('success');
                                     var source = event.source;
-									window.checkoutConfig.payment.drpay_apple_pay.redirect_url = BASE_URL + 'drpay/payment/success';
                                     if(source){
                                         jQuery.ajax({
                                             type: 'POST',
@@ -46,7 +49,8 @@
                                                 }else{
                                                     //Show Error Message 
                                                     document.getElementById('message').innerHTML = ""; 
-                                                    document.getElementById('message').innerHTML = response.content;                                                   
+                                                    document.getElementById('message').innerHTML = response.content;
+                                                    console.log(response);
                                                 }
                                             },
                                         });
@@ -75,6 +79,7 @@
                         } 
                     } 
                 });
+            //}); 
         }
     } 
     function continueApplePayOrder()

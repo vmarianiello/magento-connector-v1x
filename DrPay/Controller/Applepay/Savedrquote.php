@@ -18,10 +18,12 @@ class Savedrquote extends \Magento\Framework\App\Action\Action
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Digitalriver\DrPay\Helper\Data $helper
+        \Digitalriver\DrPay\Helper\Data $helper,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {
         $this->helper =  $helper;
         $this->_checkoutSession = $checkoutSession;
+		$this->scopeConfig = $scopeConfig;
         parent::__construct($context);
     }
 
@@ -38,19 +40,25 @@ class Savedrquote extends \Magento\Framework\App\Action\Action
             return $response->setData($responseContent);
         }
         
-        $quote = $this->_checkoutSession->getQuote();
-        $cartResult = $this->helper->createFullCartInDr($quote, 1);
-        $accessToken = $this->_checkoutSession->getDrAccessToken();
-            // $paymentResult = $this->helper->applyQuotePayment($source_id);
-        if ($cartResult) {
+        $quote = $this->_checkoutSession->getQuote();        
+        $drQuoteError = $this->_checkoutSession->getDrQuoteError();
+	    if ($drQuoteError === false) {
+			$tax_inclusive = $this->scopeConfig->getValue('tax/calculation/price_includes_tax', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
             $payload = [];
             $itemsArr = [];
             $itemPrice = 0;
             foreach ($quote->getAllVisibleItems() as $item) {
-                $itemPrice = $item->getCalculationPrice();
+				
+				$price = $item->getRowTotal();
+				if($tax_inclusive) {
+					$price = $item->getRowTotalInclTax();
+				}
+				if ($item->getDiscountAmount() > 0) {
+					$price = $price - $item->getDiscountAmount();
+				}
                 $itemsArr[] = [
                     'label' => $item->getName(),
-                    'amount' => (float)number_format($itemPrice, 2, ".", ''),
+                    'amount' => (float)$price,
                 ];
             }
             $displayItems = $itemsArr;
@@ -63,7 +71,7 @@ class Savedrquote extends \Magento\Framework\App\Action\Action
                     'currency' => $quote->getQuoteCurrencyCode(),
                     'total' => [
                         'label' => "Order Total",
-                        'amount' => (float)number_format($quote->getGrandTotal(), 2, ".", '')
+                        'amount' => (float)round($quote->getGrandTotal(), 2)
                     ],
                     'displayItems' => $displayItems,
                     'requestShipping' => false,
@@ -76,13 +84,12 @@ class Savedrquote extends \Magento\Framework\App\Action\Action
                     ],
                     "waitOnClick" => false
                 ];
-                $responseContent = [
+				 $responseContent = [
                     'success'        => true,
                     'content'        => $payload
                 ];
             }
-        }
-        $accessToken = $this->_checkoutSession->getDrAccessToken();
+        }        
         $response->setData($responseContent);
         return $response;
     }

@@ -31,15 +31,20 @@ class Savedrsource extends \Magento\Framework\App\Action\Action
     {
         $responseContent = [
             'success'        => false,
-            'content'        => ''
+            'content'        => __("Unable to process")
         ];      
         if($this->getRequest()->getParam('source_id')){
             $source_id = $this->getRequest()->getParam('source_id');
-			$this->_checkoutSession->setDrSourceId($source_id);
-			$responseContent = [
-				'success'        => true,
-				'content'        => ''
-			]; 
+            $paymentResult = $this->helper->applyQuotePayment($source_id); 
+            $accessToken = $this->_checkoutSession->getDrAccessToken();
+			$this->_logger->info("Wire Source ID: ".$source_id." accessToken: ".$accessToken." Savedrsource result : ".json_encode($paymentResult));
+
+            if($paymentResult){
+                $responseContent = [
+                    'success'        => true,
+                    'content'        => $paymentResult
+                ];            
+            }
         }
 		$response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
         $response->setData($responseContent);

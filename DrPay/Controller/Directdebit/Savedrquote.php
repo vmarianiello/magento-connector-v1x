@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * @category Digitalriver
  * @package  Digitalriver_DrPay
  */
@@ -9,26 +8,23 @@ namespace Digitalriver\DrPay\Controller\Directdebit;
 
 use Magento\Framework\Controller\ResultFactory;
 
-/**
- * Class Savedrquote
- */
 class Savedrquote extends \Magento\Framework\App\Action\Action
 {
     /**
      * @param \Magento\Framework\App\Action\Context $context
-     * @param \Digitalriver\DrPay\Helper\Data $helper
+     * @param \Magento\Checkout\Model\Session $checkoutSession
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
+        \Magento\Checkout\Model\Session $checkoutSession,
         \Digitalriver\DrPay\Helper\Data $helper
     ) {
         $this->helper =  $helper;
+        $this->_checkoutSession = $checkoutSession;
         parent::__construct($context);
     }
-	/**
-     * @return mixed|null
-     */
-	public function execute()
+
+    public function execute()
     {
         $responseContent = [
             'success'        => false,
@@ -40,12 +36,13 @@ class Savedrquote extends \Magento\Framework\App\Action\Action
         if(!$isEnabled) {
             return $response->setData($responseContent);
         }
-		$responseContent = $this->helper->setSourcePayload('directDebit');
-		if($responseContent['success'] === true) {
-			$returnurl = $this->_url->getUrl('drpay/payment/success');
-			$responseContent['content']['payload']['directDebit']['returnUrl'] = $returnurl;
-		}
+        $responseContent = [
+			'success'        => true,
+			'content'        => "true"
+		];
+        
         $response->setData($responseContent);
+
         return $response;
     }
 }

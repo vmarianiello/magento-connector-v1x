@@ -1,6 +1,7 @@
 <?php $key = $this->helper('\Digitalriver\DrPay\Helper\Data')->getConfig('dr_settings/config/public_key');?>
 <script type="text/javascript">
-	function drKlarnaLoader(){		
+	function drKlarnaLoader(){
+		var digitalriverjs = new DigitalRiver("<?php echo $key?>");
 		if(typeof digitalriverjs != "undefined"){ //If url and key set in admin
 			//loadScriptKlarna(jsUrl, function(){	
 		    //After append js set Your API Key and Start DigitalRiver.js
@@ -24,10 +25,13 @@
 								//once cart created get the payment source id
 								var klarnaData = response.content.payload;
 								drklarnajs.createSource(klarnaData).then(function(result) {
-								    if (result.error) {								        
+								    if (result.error) {
+								        console.log(result.error);
 										//Something went wrong, display the error message to the customer
+										document.getElementById('message').innerHTML ="";
+										document.getElementById('message').innerHTML =result.error;								        
 										document.getElementById('klarna-message').innerHTML ="";
-										document.getElementById('klarna-message').innerHTML = "<?= $block->escapeJs($block->escapeHtml(__('Unable to process'))); ?>";
+										document.getElementById('klarna-message').innerHTML =result.error;								        
 								    } else {
 								        var source = result.source;
 								        //console.log(source);
@@ -38,14 +42,19 @@
 								    }
 								});
 							}
-						}else{							
+						}else{
+							//Show Error Message
+							console.log(response);
 							//Something went wrong, display the error message to the customer
+							document.getElementById('message').innerHTML = "";
+							document.getElementById('message').innerHTML = response.content;
 							document.getElementById('klarna-message').innerHTML = "";
-							document.getElementById('klarna-message').innerHTML = "<?= $block->escapeJs($block->escapeHtml(__('Unable to process'))); ?>";
+							document.getElementById('klarna-message').innerHTML = response.content;
 						}
-					}
+					},
 				});	
-			});
+			});			    
+		//});
 		}
 	}
 

@@ -52,7 +52,6 @@ class OrderStatusObserver implements ObserverInterface
 				$comment = "Magento & DR order status are mis-matached";
 			}
 			$order->addStatusToHistory($order->getStatus(),__($comment));
-			$order->save();
 		}
 	}
 }

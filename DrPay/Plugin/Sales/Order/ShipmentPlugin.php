@@ -54,14 +54,12 @@ class ShipmentPlugin {
 
                 if($shipmentItem->getQty() > 0) {
                     $lineItemId = $orderItem->getDrOrderLineitemId();
-					$magentoLineItemID = $orderItem->getItemId();
                     // Some cases, DR line item id is empty for parent products
                     if(!empty($lineItemId)) {
                         $items[$lineItemId] = [
                             "requisitionID"             => $order->getDrOrderId(),
                             "noticeExternalReferenceID" => $order->getIncrementId(),
                             "lineItemID"                => $lineItemId,
-							"magentoLineItemID"         => $magentoLineItemID,
                             "quantity"                  => $orderItem->getQtyShipped()
                         ];
                     }

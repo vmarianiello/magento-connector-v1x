@@ -27,42 +27,46 @@ class Saveaddress extends \Magento\Framework\App\Action\Action
 
     public function execute()
     {
-        $quote = $this->_checkoutSession->getQuote();
-        $cartResult = $this->helper->createFullCartInDr($quote, 1);
-        $accessToken = $this->_checkoutSession->getDrAccessToken();
-        $responseContent = [];
-          // $paymentResult = $this->helper->applyQuotePayment($source_id);
-          $payload = [];
-          $itemsArr = [];
-          $itemPrice = 0;
-        foreach ($quote->getAllVisibleItems() as $item) {
-            $itemPrice = $item->getCalculationPrice();
-            $itemsArr[] = [
-                'label' => $item->getName(),
-                'amount' => (float)number_format($itemPrice, 2, ".", ''),
-            ];
-        }
-          $displayItems = $itemsArr;
-          $address = $quote->getBillingAddress();
-        if ($address->getId() && $address->getCountryId()) {
-            $countryId = $address->getCountryId();
-            //Prepare the payload and return in response for DRJS paypal payload
-            $payload = [
-                'shippingOptions' => [],
-                'total' => [
-                    'label' => "Order Total",
-                    'amount' => (float)number_format($quote->getGrandTotal(), 2, ".", '')
-                ],
-                'displayItems' => $displayItems
-            ];
-            $responseContent = [
-                'status'        => "success",
-                'content'        => $payload
-            ];
-        }
+		$quote = $this->_checkoutSession->getQuote();
+		$accessToken = $this->_checkoutSession->getDrAccessToken();
+		$responseContent = [];
+		$payload = [];
+		$itemsArr = [];
+		$itemPrice = 0;
+		foreach ($quote->getAllVisibleItems() as $item) {
+			$price = $item->getRowTotal();
+			if($tax_inclusive) {
+				$price = $item->getRowTotalInclTax();
+			}
+			if ($item->getDiscountAmount() > 0) {
+				$price = $price - $item->getDiscountAmount();
+			}
+			$itemsArr[] = [
+			'label' => $item->getName(),
+			'amount' => $price,
+			];
+		}
+		$displayItems = $itemsArr;
+		$address = $quote->getBillingAddress();
+		if ($address->getId() && $address->getCountryId()) {
+			$countryId = $address->getCountryId();
+			//Prepare the payload and return in response for DRJS paypal payload
+			$payload = [
+				'shippingOptions' => [],
+				'total' => [
+					'label' => "Order Total",
+					'amount' => round($quote->getGrandTotal(), 2)
+				],
+				'displayItems' => $displayItems
+			];
+			$responseContent = [
+				'status'        => "success",
+				'content'        => $payload
+			];
+		}
 
-        $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-        $response->setData($responseContent);
-        return $response;
-    }
+		$response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+		$response->setData($responseContent);
+		return $response;
+	}
 }

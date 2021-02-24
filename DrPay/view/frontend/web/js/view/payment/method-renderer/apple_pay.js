@@ -7,13 +7,12 @@
 define([
     'jquery',
     'underscore',
-    'Magento_Checkout/js/view/payment/default',
-	'Magento_Paypal/js/action/set-payment-method',
+    'Magento_Checkout/js/view/payment/default'
+
 ], function (
     $,
     _,
-    Component,
-	setPaymentMethodAction
+    Component
 ) {
     'use strict';
 
@@ -21,12 +20,6 @@ define([
         defaults: {
             template: 'Digitalriver_DrPay/payment/apple_pay',
             code: 'drpay_apple_pay'
-		},
-		redirectAfterPlaceOrder: false,
-		/** Redirect to custom controller for payment */
-		afterPlaceOrder: function () {
-			$.mage.redirect(window.checkoutConfig.payment.drpay_apple_pay.redirect_url);
-			return false;
 		},
         /**
          * Get payment name
@@ -92,17 +85,6 @@ define([
                 return "B"; 
             }
         },
-		placeOrder: function () {
-			//update payment method information if additional data was changed
-//			this.selectPaymentMethod();
-			setPaymentMethodAction(this.messageContainer).done(
-				function () {
-					$.mage.redirect(window.checkoutConfig.payment.drpay_apple_pay.redirect_url);
-				}
-			);
-
-			return false;
-		},
         radioInit: function(){
             $(".payment-methods input:radio:first").prop("checked", true).trigger("click");
         }        

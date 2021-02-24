@@ -1,33 +1,32 @@
 <?php
 /**
- *
- * @category Digitalriver
- * @package  Digitalriver_DrPay
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
  */
 
 namespace Digitalriver\DrPay\Controller\Wiretransfer;
 
 use Magento\Framework\Controller\ResultFactory;
 
-/**
- * Class Savedrquote
- */
 class Savedrquote extends \Magento\Framework\App\Action\Action
 {
-    /**
+    protected $regionModel;
+	/**
      * @param \Magento\Framework\App\Action\Context $context
-     * @param \Digitalriver\DrPay\Helper\Data $helper
+     * @param \Magento\Checkout\Model\Session $checkoutSession
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
-        \Digitalriver\DrPay\Helper\Data $helper
+		\Magento\Checkout\Model\Session $checkoutSession,
+        \Magento\Directory\Model\Region $regionModel,
+		\Digitalriver\DrPay\Helper\Data $helper
     ) {
-        $this->helper =  $helper;
-        parent::__construct($context);
+		$this->helper =  $helper;
+		$this->_checkoutSession = $checkoutSession;
+        $this->regionModel = $regionModel;
+		parent::__construct($context);
     }
-	/**
-     * @return mixed|null
-     */
+
     public function execute()
     {
         $responseContent = [
@@ -39,12 +38,14 @@ class Savedrquote extends \Magento\Framework\App\Action\Action
         $isEnabled = $this->helper->getIsEnabled();
         if(!$isEnabled) {
             return $response->setData($responseContent);
-        }
-		$responseContent = $this->helper->setSourcePayload('wireTransfer');
-		if($responseContent['success'] === true) {
-			$responseContent['content']['payload']['wireTransfer'] = (object) null;
-		}
+        }       
+		$responseContent = [
+			'success'        => true,
+			'content'        => "true"
+		];
+        
         $response->setData($responseContent);
+
         return $response;
     }
 }

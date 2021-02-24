@@ -59,7 +59,7 @@ class UpdateOrderDetails implements ObserverInterface
 		$order = $observer->getEvent()->getOrder();
 		$quote = $observer->getEvent()->getQuote();
 		$result = $observer->getEvent()->getResult();
-		$cartresult = $observer->getEvent()->getCartResult();
+		
 		if(isset($result["submitCart"]["order"]["id"])){
 			$orderId = $result["submitCart"]["order"]["id"];
 			$order->setDrOrderId($orderId);
@@ -163,11 +163,8 @@ class UpdateOrderDetails implements ObserverInterface
 			$this->session->unsDrShippingTax();
 			$this->session->unsDrShippingAndHandling();
 			$this->session->unsDrShippingAndHandlingExcl();
-			$this->session->unsDrPaymentSessionId();
 			
-			$this->session->unsDrOrderTotal();
-
-			$this->session->unsDrSourceId();
+			$this->session->unsDrOrderTotal();			
 		}
     }
 
