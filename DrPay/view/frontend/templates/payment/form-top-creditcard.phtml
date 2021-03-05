@@ -1,4 +1,16 @@
-<?php $key = $this->helper('\Digitalriver\DrPay\Helper\Data')->getConfig('dr_settings/config/public_key');?>
+<?php 
+$key = $this->helper('\Digitalriver\DrPay\Helper\Data')->getConfig('dr_settings/config/public_key');
+##$usr_locale = $this->helper('\Digitalriver\DrPay\Helper\Data')->getLocale();
+$usr_locale = $this->helper('\Digitalriver\DrPay\Helper\Data')->getLocale();
+
+$usr_locale_country = substr($usr_locale , 3, strrpos($usr_locale , '_'));
+
+##$payment-session-id = $this->helper('\Digitalriver\DrPay\Helper\Data')->getDrPaymentSessionId();
+##$payment-session-id = $this->helper('\Digitalriver\DrPay\Helper\Data')->getPaymentSessionId();
+
+
+
+?>
 <script type="text/javascript">
 	var digitalriverjs = new DigitalRiver("<?php echo $key?>");
 	function drCreditCardLoader(){
@@ -181,5 +193,51 @@
 	function showForm(){
 		jQuery("#drpay_creditcard-content .payment-method-instruction").show();
 		jQuery("#drpay_creditcard-content #drpay-creditcard-form .payment-form-inner").show();
+	}
+	
+	//alert('<?php echo $usr_locale?>');
+	
+	//alert('<?php echo $usr_locale_country?>');
+	
+	
+
+	
+	
+	function setTaxID(){
+		
+		let digitalriver = new DigitalRiver("<?php echo $key?>", {
+    "locale": "<?php echo $usr_locale_country?>"
+});
+                        
+let options = {
+    "classes": {
+        "base": "DRElement",
+        "complete": "taxId-complete",
+        "empty": "taxId-empty",
+        "focus": "taxId-focus"
+    },
+    "style": {
+        "base": {
+            "color": "#495057",
+            "height": "35px",
+            "fontSize": "1rem",
+            "fontFamily": "apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif"
+        },
+        "complete": {
+            "color": "green",
+            ":-webkit-autofill": {
+                "color": "green"
+            }
+        }
+    },
+    "taxIdentifier": {
+        "sessionId": "",
+        "type": "individual"
+    }
+}
+                                    
+let taxIdentifier = digitalriver.createElement('taxidentifier', options);
+taxIdentifier.mount("tax-id-container");
+		
 	}
 </script>
