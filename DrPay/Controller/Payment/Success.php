@@ -54,8 +54,7 @@ class Success extends \Magento\Framework\App\Action\Action
 		\Digitalriver\DrPay\Model\DrConnector $drconnector,
 		\Magento\Framework\Json\Helper\Data $jsonHelper,
 		\Magento\Quote\Api\CartManagementInterface $quoteManagement,
-        \Magento\Quote\Model\QuoteFactory $quoteFactory,
-		\Digitalriver\DrPay\Logger\Logger $logger
+        \Magento\Quote\Model\QuoteFactory $quoteFactory
     ) {
         $this->customerSession = $customerSession;
         $this->order = $order;
@@ -66,7 +65,6 @@ class Success extends \Magento\Framework\App\Action\Action
         $this->drconnector = $drconnector;
 		$this->jsonHelper = $jsonHelper;
 		$this->quoteManagement = $quoteManagement;
-		$this->_logger = $logger;
         return parent::__construct($context);
     }
     
@@ -122,21 +120,8 @@ class Success extends \Magento\Framework\App\Action\Action
 					$isValidQuote = $this->helper->validateQuote($quote);
 
 					if(!empty($isValidQuote)){
-						$this->_logger->info("DR Cart submitted: " . $result['submitCart']['order']['id']);
-						if(isset($result["submitCart"]['paymentMethod']['type']) && $result["submitCart"]['paymentMethod']['type'] == 'payPal') {
-							$this->_logger->info("Reset the billing and shipping address to the quote from Paypal");
-							// Update Quote's Billing Address details from DR Order creation response
-							if (isset($result['submitCart']['billingAddress'])) {
-								$billingAddress = $this->helper->getDrAddress('billing', $result);
-								if (!empty($billingAddress)) {
-									$quote->getBillingAddress()->addData($billingAddress);
-								} // end: if
-							} // end: if
-						}
-
 						$order = $this->quoteManagement->submit($quote);
 						if ($order) {
-							$this->_logger->info("Submitted Magento Order : " . $order->getId());
 							$this->checkoutSession->setLastOrderId($order->getId())
 									->setLastRealOrderId($order->getIncrementId())
 									->setLastOrderStatus($order->getStatus());
@@ -151,7 +136,7 @@ class Success extends \Magento\Framework\App\Action\Action
 							$paymentData = $result["submitCart"]['paymentMethod']['wireTransfer'];
 							$order->getPayment()->setAdditionalInformation($paymentData);
 						}
-						$this->_logger->info("Update Magento Order details with DR tax info");
+
 						$this->_eventManager->dispatch('dr_place_order_success', ['order' => $order, 'quote' => $quote, 'result' => $result, 'cart_result' => $cartresult]);
 						$this->_redirect('checkout/onepage/success', array('_secure'=>true));
 						return;

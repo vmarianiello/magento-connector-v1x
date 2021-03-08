@@ -55,8 +55,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
 	protected $itemFactory;
 
-	protected $httprequest;
-
     /**
          * @param Context                                          $context
          * @param \Magento\Checkout\Model\Session                  $session
@@ -90,8 +88,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Directory\Model\CurrencyFactory $currencyFactory,
         \Digitalriver\DrPay\Logger\Logger $logger,
         \Magento\Framework\App\Response\RedirectInterface $redirect,
-		\Magento\Sales\Model\Order\ItemFactory $itemFactory,
-		\Magento\Framework\HTTP\PhpEnvironment\Request $httprequest
+		\Magento\Sales\Model\Order\ItemFactory $itemFactory
     ) {
         $this->session = $session;
         $this->storeManager = $storeManager;
@@ -111,7 +108,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         parent::__construct($context);
         $this->_logger = $logger;
 		$this->itemFactory = $itemFactory;
-		$this->httprequest = $httprequest;
     }
     /**
      * @return string|null
@@ -723,7 +719,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function createOrderInDr($accessToken)
     {
         if ($this->getDrBaseUrl() && $accessToken) {
-			$ip = $this->httprequest->getClientIp();
+			$ip = $this->remoteAddress->getRemoteAddress();
             $url = $this->getDrBaseUrl()."v1/shoppers/me/carts/active/submit-cart?expand=all&format=json&ipAddress=".$ip;
             $data = [];
             $this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
@@ -1245,8 +1241,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 $region = $this->regionModel->loadByCode($drAddress['countrySubdivision'], $drAddress['country'])->getData();
 
                 $street = $drAddress['line1'];
-                $street .= (!empty($drAddress['line2'])) ? ("\n".$drAddress['line2']) : '';
-                $street .= (!empty($drAddress['line3'])) ? ("\n".$drAddress['line3']) : '';
+                $street .= (!empty($drAddress['line2'])) ? (' '.$drAddress['line2']) : null;
+                $street .= (!empty($drAddress['line3'])) ? (' '.$drAddress['line3']) : null;
 
                 $street = trim($street);
                 $phone  = str_replace('-', '', $drAddress['phoneNumber']);
