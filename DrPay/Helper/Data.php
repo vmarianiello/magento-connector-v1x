@@ -109,6 +109,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->_logger = $logger;
 		$this->itemFactory = $itemFactory;
     }
+	
+	
+	 public function getEmailAddress($quote) {
+		 $address = $quote->getBillingAddress();
+		 return $address->getEmail();
+		 
+	 }
+	
     /**
      * @return string|null
      */

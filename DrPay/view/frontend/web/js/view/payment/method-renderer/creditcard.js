@@ -11,11 +11,13 @@ define(
     'underscore',
     'Magento_Checkout/js/view/payment/default',
 	'Magento_Paypal/js/action/set-payment-method',
+	'Magento_Checkout/js/model/quote',
     ], function (
         $,
 		_,
 		Component,
-		setPaymentMethodAction
+		setPaymentMethodAction,
+		quote
     ) {
         'use strict';
 
@@ -99,7 +101,7 @@ define(
 				},
                 radioInit: function () {
                     $(".payment-methods input:radio:first").prop("checked", true).trigger("click");
-                }        
+                }				
             }
         );
     }

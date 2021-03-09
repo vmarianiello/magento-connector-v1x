@@ -3,9 +3,18 @@ $key = $this->helper('\Digitalriver\DrPay\Helper\Data')->getConfig('dr_settings/
 $usr_locale = $this->helper('\Digitalriver\DrPay\Helper\Data')->getLocale();
 $usr_locale_country = substr($usr_locale , 3, strrpos($usr_locale , '_'));
 $usr_locale_language = substr($usr_locale , 0, strrpos($usr_locale , '_'));
+
+#$order = $block->getOrder();
+#$shippingAddress = $order->getShippingAddress(); 
+#$usr_email = $this->helper('\Digitalriver\DrPay\Helper\Data')->getEmailAddress();
+
+##$usr_email = $this->helper('\Digitalriver\DrPay\Helper\Data')->getEmailAddress();
+
+## alert('<?php echo $usr_email
 ?>
 <script type="text/javascript">
-	var digitalriverjs = new DigitalRiver("<?php echo $key?>");
+	var digitalriverjs = new DigitalRiver('<?php echo $key?>');
+
 	function drCreditCardLoader(){
 		if(typeof digitalriverjs != "undefined"){ //If url and key set in admin
 			//loadScriptCard(jsUrl, function(){
@@ -56,7 +65,7 @@ $usr_locale_language = substr($usr_locale , 0, strrpos($usr_locale , '_'));
 		
 		
 		
-		
+		taxIdentifier();
 		
 		}
 	}
@@ -195,11 +204,81 @@ $usr_locale_language = substr($usr_locale , 0, strrpos($usr_locale , '_'));
 
 	
 	function taxIdentifier() {
-		
-alert('1');
+let taxIdentifier;
+           
+            if (taxIdentifier) {
+                taxIdentifier.destroy();
+            }
+
+            jQuery('#tax-id-container').html('');
+            //setCountry(session.countryData.countryCode);
+          //  set3dsCards(session.countryData.supports3ds);
+
+          var  publicApiKey = '<?php echo $key?>'//$('#apiKey').val();
+         var  locale = '<?php echo $usr_locale_country?>'//$('#locales').val();
+
+            var country = '<?php echo $usr_locale_country?>';//$('#country').val();
+            var usage = 'country';//$("input[type='radio'][name='usage']:checked").val();
+          //  var savePayment = $('#savePayment').val();
+          //  var showCompliance = $('#showCompliance').val();
+          //  var customizeButton = $('#customizeButton').val();
+          //  var customerType = $('#customerType').val();
+
+            let options = {
+                classes: {
+                    base: "DRElement",
+                    complete: "taxId-complete",
+                    empty: "taxId-empty",
+                    focus: "taxId-focus"
+                },
+                style: {
+                    base: {
+                        color: '#495057',
+                        height: '35px',
+                        fontSize: '1rem',
+                        fontFamily: 'apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',
+                    },
+                    complete: {
+                        color: 'green',
+                        ':-webkit-autofill': {
+                            color: 'green'
+                        }
+                    }
+                },
+                taxIdentifier: {
+					country: '<?php echo $usr_locale_country?>'
+                }
+            }
+
+
+
+            digitalriverpayments = new DigitalRiver(publicApiKey, {
+                "locale": '<?php echo $usr_locale_country?>'
+            });
+
+            taxIdentifier = digitalriverpayments.createElement('taxidentifier', options);
+            taxIdentifier.mount('tax-id-container');
+
+            taxIdentifier.on('ready', function (data) {
+                if (!data.hasTaxIdentifier) {
+                
+                }
+			//	var submitTaxIdBtn = '<div class=""><span class="submitDrTaxId">SUBMIT</span></div>';
+			//	jQuery('#tax-id-container').append(submitTaxIdBtn);
+  
+            });
+
+            taxIdentifier.on('change', function (data) {
+             //   
+            });
+
+
+
 	}
 	
 	
+
+
 
 
 </script>
