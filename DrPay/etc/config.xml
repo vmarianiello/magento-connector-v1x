@@ -62,7 +62,16 @@
                 <allowspecific>0</allowspecific>
                 <sort_order>1</sort_order>
                 <title><![CDATA[Klarna]]></title>
-            </drpay_klarna> 
+            </drpay_klarna>
+			<drpay_IBP>
+                <active>0</active>
+                <sort_order>1</sort_order>
+                <model>Digitalriver\DrPay\Model\IBP</model>
+                <order_status>pending_payment</order_status>
+                <allowspecific>0</allowspecific>
+                <sort_order>1</sort_order>
+                <title><![CDATA[IBP]]></title>
+            </drpay_IBP> 
         </payment>
     </default>
 </config>
